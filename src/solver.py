@@ -9,8 +9,10 @@ FIELDSIZE = 4
 class Field(object):
     def __init__(self, elements):
         assert len(elements) == FIELDSIZE*FIELDSIZE
-        self.lines = (elements[0:FIELDSIZE], elements[FIELDSIZE:2*FIELDSIZE], 
-                      elements[2*FIELDSIZE:3*FIELDSIZE], elements[3*FIELDSIZE:4*FIELDSIZE])
+        self.lines = []
+        for i in range(FIELDSIZE):
+            self.lines.append(elements[i * FIELDSIZE : (i * FIELDSIZE) + FIELDSIZE])
+        # initialize some values we will need often for better performance
         self.allFields = [(x, y) for x in range(FIELDSIZE) for y in range(FIELDSIZE)]
         self.characterSet = set(elements)
     
@@ -45,19 +47,17 @@ class Field(object):
             chosenElements = []
         if len(word) == 0:
             return True
-        for character in word.lower():
-            if character not in self.characterSet:
-                return False
+        character = word[0]
+        if character in self.characterSet:
             for pick in self.possibleNextPicks(chosenElements):
                 if self.lines[pick[0]][pick[1]].lower() == character:
                     chosenElements.append(pick)
                     return self.exists(word[1:], chosenElements)
-            return False
+        return False
                     
         
 
 if __name__ == '__main__':
-    #allWords = open("top10000de.txt").read().split()
     allWords = open("allWords.txt").read().split()
     
     fieldString = raw_input("Please enter all characters: ")
